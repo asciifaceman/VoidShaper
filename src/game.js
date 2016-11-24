@@ -1,195 +1,124 @@
-var game = new Phaser.Game(1024, 768, Phaser.AUTO, '');
- 
+//
+// VoidShaper
+// Inspired by Peter F Hamilton's void series
+//
+
+// Game configuration
+var gameConfg = {
+  width: 800,
+  height: 600,
+  renderer: Phaser.AUTO,
+  antialias: false,
+  transparent: false,
+  backgroundColor: '#0076a3',
+  //parent: 'phaser-example',
+  //scaleMode: Phaser.ScaleManager.EXACT_FIT
+}
+// Create game object
+var game = new Phaser.Game(gameConfg);
+
 game.state.add('play', {
   preload: function() {
-    // System
-    game.load.spritesheet('timer', 'assets/timer/timer.png', 150, 20);
-    
-    // Other
-    game.load.image('egg', 'assets/egg_0.png');
-    game.load.image('bg', 'assets/shaping.png');
 
-    // Panel build
-    var bmd = this.game.add.bitmapData(200, 500);
-    bmd.ctx.fillStyle = '#9a783d';
-    bmd.ctx.strokeStyle = '#35371c';
-    bmd.ctx.lineWidth = 12;
-    bmd.ctx.fillRect(0, 0, 200, 500);
-    bmd.ctx.strokeRect(0, 0, 200, 500);
-    this.game.cache.addBitmapData('upgradePanel', bmd);    
+    game.load.image('itembg', 'assets/itemBackground.png');
+    game.load.spritesheet('button', 'assets/buttonsheet300x87x3.png', 300, 87);
+    game.load.image('barFront', 'assets/barInterior.png');
+    game.load.image('barBack', 'assets/barExterior.png');
 
-    var smd = this.game.add.bitmapData(520, 500);
-    smd.ctx.fillStyle = '#9a783d';
-    smd.ctx.strokeStyle = '#35371c';
-    smd.ctx.lineWidth = 12;
-    smd.ctx.fillRect(0, 0, 520, 500);
-    smd.ctx.strokeRect(0, 0, 520, 500);
-    this.game.cache.addBitmapData('shapePanel', smd);
+    // A panel experiment
+    var panelTest = this.game.add.bitmapData(250, 500);
+    panelTest.ctx.fillStyle = '#5a6772';
+    panelTest.ctx.strokeStyle = '#31363a';
+    panelTest.ctx.lineWidth = 5;
+    panelTest.ctx.fillRect(0, 0, 250, 500);
+    panelTest.ctx.strokeRect(0, 0, 250, 500);
+    this.game.cache.addBitmapData('panel', panelTest);
 
-    var rmd = this.game.add.bitmapData(200, 500);
-    rmd.ctx.fillStyle = '#9a783d';
-    rmd.ctx.strokeStyle = '#35371c';
-    rmd.ctx.lineWidth = 12;
-    rmd.ctx.fillRect(0, 0, 200, 500);
-    rmd.ctx.strokeRect(0, 0, 200, 500);
-    this.game.cache.addBitmapData('rightPanel', rmd); 
+    var panelTestHead = this.game.add.bitmapData(250, 30);
+    panelTestHead.ctx.fillStyle = '#282c33';
+    panelTestHead.ctx.strokeStyle = '#31363a';
+    panelTestHead.ctx.lineWidth = 5;
+    panelTestHead.ctx.fillRect(0, 0, 250, 30);
+    this.game.cache.addBitmapData('panelHead', panelTestHead);
 
-
-    var buttonImage = this.game.add.bitmapData(150, 30);
-    buttonImage.ctx.fillStyle = '#e6dec7';
-    buttonImage.ctx.strokeStyle = '#35371c';
-    buttonImage.ctx.lineWidth = 4;
-    buttonImage.ctx.fillRect(0, 0, 150, 30);
-    buttonImage.ctx.strokeRect(0, 0, 150, 30);
-    this.game.cache.addBitmapData('button', buttonImage);
+    var panelItem = this.game.add.bitmapData(225, 40);
+    panelItem.ctx.strokeStyle = '#31363a';
+    panelItem.ctx.lineWidth = 5;
+    //panelItem.ctx.fillRect(0, 0, 200, 40);
+    panelItem.ctx.strokeRect(0, 0, 225, 40);
+    this.game.cache.addBitmapData('panelItem', panelItem);
 
     game.stage.disableVisibilityChange = true;
 
-    // Main player data
-    this.player = {
-      gold: 0
-    }
+    this.grow = 0;
     this.system = {
       interval: 100,
       version: 0.1,
-    }
-    this.genistars = {
-      egg: ["Eggs", 0, 0, 0], // 0name, 1owned, 2shaping, 3value
-      def: ["Default", 1, 0, 0],
-      mouse: ["Ge-mouse", 0, 0, 0],
-    }
-    this.shaping = {
-      egg: [0, 0, ]
-    }
-
-    this.lastUpdate = new Date().getTime();
-    if(!localStorage.getItem("lastUpdate")) localStorage.setItem('lastUpdate', new Date().getTime());
+    }    
   },
+
+  click: function() {
+    console.log("Clicked");
+  },
+
+  createStablePanel: function() {
+    var state = this;
+    var style = { font: "16px Courier", fill: "#fff", tabs: 80 };
+
+    this.stableGroup = this.game.add.group();
+    this.stableGroup.position.setTo(25, 50);
+
+    this.stableBody = this.stableGroup.addChild(this.game.add.image(0, 0, this.game.cache.getBitmapData('panel')));
+    this.stableHead = this.stableGroup.addChild(this.game.add.image(0, 0, this.game.cache.getBitmapData('panelHead')));
+    this.stableHead.alpha = 0.8;
+
+    this.stableHeadText = this.stableGroup.addChild(this.game.add.text(5, 5, "Stable", style));
+    //this.stableBodyTest = this.stableGroup.addChild(this.game.add.text(5,30, "Item\tCount\tAction", style));
+
+    //this.item = this.stableGroup.addChild(this.game.add.image(12, 50, this.game.cache.getBitmapData('panelItem')));
+    //this.item = this.stableGroup.addChild(this.game.add.sprite(12, 50, 'itembg'));
+    //this.itemText = this.stableGroup.addChild(this.game.add.text(20, 60, "Eggs\tcount\tbar", style));
+
+    // Button
+    this.button = this.stableGroup.addChild(this.game.add.button(this.stableGroup.width-80, 50, 'button', this.click, this, 2, 2, 1));
+    this.button.scale.setTo(0.25, 0.25);
+    this.buttonText = this.stableGroup.addChild(this.game.add.text(this.button.x+15, this.button.y+2, "Shape", style));
+
+    // Progress Bar
+    this.barBack = this.stableGroup.addChild(this.game.add.image(this.button.left-100, this.button.top+2, 'barBack'));
+    this.barBack.scale.setTo(0.75,0.75);
+    this.barFront = this.stableGroup.addChild(this.game.add.image(this.button.left-96, this.button.top+6, 'barFront'));
+    this.barFullWidth = this.barFront.width;
+    this.barFront.scale.setTo(0.75,0.75);
+
+    this.initBar(this.barFront);
+    this.RunTime = this.game.time.events.loop(this.system.interval, this.GameLoop, this);
+  },
+
+  initBar: function(barObj) {
+    this.barRect = new Phaser.Rectangle(0, 0, 0, barObj.height);
+    barObj.crop(this.barRect);
+  },
+  
   create: function() {
     var state = this;
+    this.createStablePanel();
+
     
-    this.background = this.game.add.group();
-    ['bg' ]
-    .forEach(function(image) {
-      var bg = state.game.add.tileSprite(0, 0, state.game.world.width, 
-        state.game.world.height, image, '', state.background);
-      bg.tileScale.setTo(1,1);
-    });
-    this.titleLabel = this.background.addChild(this.game.add.text(this.background.width-190, this.background.height-40, "Void Shaper v" + this.system.version, {
-      font: '20px Arial Black',
-      //fill: '#868686',
-      fill: '#fff',
-      strokeThickness: 4
-    }));
-
-    // Stable panel
-    this.upgradePanel = this.game.add.image(10, 50, this.game.cache.getBitmapData('upgradePanel'));
-    this.shapePanel = this.game.add.image(250, 50, this.game.cache.getBitmapData('shapePanel')); // +40
-    this.rightPanel = this.game.add.image(window.innerWidth-625, 50, this.game.cache.getBitmapData('rightPanel'));
-
-    //
-    // Stable data
-    //
-    this.stableinfoUI = this.game.add.group();
-    this.stableinfoUI.position.setTo(this.upgradePanel.x, this.upgradePanel.y);
-    this.stableTopText = this.stableinfoUI.addChild(this.game.add.text(15, 10, "Stable", {
-      font: '28px Arial Black',
-      //fill: '#868686',
-      fill: '#fff',
-      strokeThickness: 4
-    }));
-    this.defaultLabel = this.stableinfoUI.addChild(this.game.add.text(15, 50, this.genistars['def'][0] + ": " + this.genistars['def'][1], {
-      font: '16px Arial Black',
-      //fill: '#868686',
-      fill: '#fff',
-      strokeThickness: 4
-    }));
-    //this.eggsLayLabel = this.stableinfoUI.addChild(this.game.add.text(15, 70, "New Egg: " + this.genistars['egg'][2] + "%", {
-    //  font: '16px Arial Black',
-      //fill: '#868686',
-    //  fill: '#fff',
-    //  strokeThickness: 4
-    //}));
-    this.eggLayBarBack = this.stableinfoUI.addChild(this.game.add.sprite(15, 70, 'timer', 1));
-    this.eggLayBarFront = this.stableinfoUI.addChild(this.game.add.sprite(15, 70, 'timer', 0));
-    this.fullWidth = this.eggLayBarFront.width;
-    this.initBar();
-
-    this.eggsLabel = this.stableinfoUI.addChild(this.game.add.text(15, 90, "Eggs: " + this.genistars['egg'][1], {
-      font: '16px Arial Black',
-      //fill: '#868686',
-      fill: '#fff',
-      strokeThickness: 4
-    }));
-    this.mouseLabel = this.stableinfoUI.addChild(this.game.add.text(15, 110, "Ge-mouse: " + this.genistars['mouse'][1], {
-      font: '16px Arial Black',
-      //fill: '#868686',
-      fill: '#fff',
-      strokeThickness: 4
-    }));    
-    //var eggSprite = game.add.sprite(580, 280, 'egg');
-    //eggSprite.anchor.setTo(0.5, 0.5);
-
-    //
-    // Shaping UI 
-    //
-    this.shapingInfoUI = this.game.add.group();
-    this.stableTopText = this.stableinfoUI.addChild(this.game.add.text(window.innerWidth-625, 10, "Shaping", {
-      font: '28px Arial Black',
-      //fill: '#868686',
-      fill: '#fff',
-      strokeThickness: 4
-    }));
-
-    var button;
-    button = this.game.add.button(window.innerWidth-600, 100, this.game.cache.getBitmapData('button'));
-    button.icon = button.addChild(this.game.add.image(6, -3, 'egg'));
-    button.text = button.addChild(this.game.add.text(42, 0, 'Shape'));
-    button.details = {cost: 1};
-    //
-    // SYSTEM
-    //
-    // 100ms 10x a second
-    this.GameLoop = this.game.time.events.loop(this.system.interval, this.GameLoop, this);
-
   },
-  initBar: function() {
-    this.rect = new Phaser.Rectangle(0, 0, 0, this.eggLayBarFront.height);
-    this.eggLayBarFront.crop(this.rect);
-  },
-  updateText: function() {
-    this.eggsLabel.text = this.genistars['egg'][0] + ": " + this.genistars['egg'][1];
-    this.mouseLabel.text = this.genistars['mouse'][0] + ": " + this.genistars['mouse'][1];
-    //this.eggsLayLabel.text = "New Egg: " + this.genistars['egg'][2] + "%";
-    this.defaultLabel.text = this.genistars['def'][0] + ": " + this.genistars['def'][1];
-    this.rect.width = Math.max(0, (this.genistars['egg'][2] / 100) * this.fullWidth);
-    this.eggLayBarFront.crop(this.rect);
-  },
-  growEggs: function() {
-    // Laying eggs
-    this.genistars['egg'][2] += 1;
-    if (this.genistars['egg'][2] >= 100) {
-      this.genistars['egg'][1] += (this.genistars['def'][1] * 1);
-      this.genistars['egg'][2] = 0;
-    }
 
-  },
-  GameLoop: function() {
-    var thisUpdate = new Date().getTime();
-    this.diff =  thisUpdate - localStorage.getItem('lastUpdate', new Date().getTime());
-    this.intervalsPassed = Math.round(this.diff / this.system.interval);
-
-    // Catcup loop. Usually just one or two
-    for (var i = 1; i <= this.intervalsPassed; i++) {
-      this.growEggs();
-      this.updateText();
-    }
-    
-    localStorage.setItem('lastUpdate', thisUpdate);
-  },
   render: function() {
-    
+
+  },
+
+  GameLoop: function() {
+    this.grow++;
+    if (this.grow >= 100) {
+      this.grow = 0;
+    }
+    this.barRect.width = Math.max(0, (this.grow / 100) * this.barFullWidth);
+    this.barFront.crop(this.barRect);
   }
 });
- 
+
 game.state.start('play');
