@@ -11,7 +11,7 @@ var gameConfg = {
   antialias: false,
   transparent: false,
   backgroundColor: '#0076a3',
-  //parent: 'phaser-example',
+  parent: 'phaser',
   //scaleMode: Phaser.ScaleManager.EXACT_FIT
 }
 
