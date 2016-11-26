@@ -48,7 +48,41 @@ function KeyValueText(game, x, y, panelGroup, size) {
   };
 }
 
-function ProgressBar(game, x, y, panelGroup, bgGraphic, fgGraphic) {
+function AddButton(game, x, y, panelGroup, name="None") {
+  this.game = game;
+  this.x = x;
+  this.y = y;
+  this.group = panelGroup;
+  this.name = name;
+  this.styleTitle = { font: "10px Courier", fill: "#fff", tabs: 80 };
+
+  this.btn = this.group.addChild(this.game.add.image(this.x, this.y, 'addBtn'));
+  this.btn.scale.setTo(0.03, 0.03);
+//    // First lets see if we need to pay the troll toll
+//    if (this.game.state.states.play.player.eggs >= 1 ) {
+//      // We're referencing game directly, this.game is out of date :\
+//      this.game.state.states.play.player.eggs--;
+//      this.game.state.states.play.genistars.pool[this.name].eggPaid++;
+//    }
+  this.btn.inputEnabled = true;
+  this.btn.events.onInputDown.add(function() { this.Click() }, this);
+  this.countObj = this.group.addChild(this.game.add.text(this.x+5, this.y+3, game.state.states.play.genistars.pool[this.name].eggPaid, this.styleTitle))
+
+  this.Click = function () {
+    this.game = game;
+    // If you are not named, then exit now
+    if (this.name == "None") {
+      return;
+    }
+    // pay for some eggs mang
+    if (game.state.states.play.player.eggs >= 1) {
+      game.state.states.play.player.eggs -= 1;
+      game.state.states.play.genistars.pool[this.name].eggPaid++;
+    }
+  }
+}
+
+function ProgressBar(game, x, y, panelGroup, bgGraphic, fgGraphic, name="None", counted=false) {
   this.game = game;
   this.x = x;
   this.y = y;
@@ -56,6 +90,9 @@ function ProgressBar(game, x, y, panelGroup, bgGraphic, fgGraphic) {
   this.bgGraphic = bgGraphic;
   this.fgGraphic = fgGraphic;
   this.rect = null;
+  this.name = name;
+  this.counted = counted;
+  this.styleTitle = { font: "10px Courier", fill: "#fff", tabs: 80 };
 
   this.barBg = this.group.addChild(this.game.add.image(this.x, this.y, this.bgGraphic));
   if (this.bgGraphic == 'barBack' || this.bgGraphic == 'barFront') {
@@ -67,6 +104,25 @@ function ProgressBar(game, x, y, panelGroup, bgGraphic, fgGraphic) {
     this.barFg.scale.setTo(0.75, 0.75);
   }
 
+  if (this.counted) {
+    this.activeObj = this.group.addChild(this.game.add.text(this.x+10, this.y+3, "", this.styleTitle))
+  }
+
+  this.barBg.inputEnabled = true;
+  this.barBg.events.onInputDown.add(function() { this.Click() }, this);
+
+  this.Click = function () {
+    this.game = game;
+    // If you are not named, then exit now
+    if (this.name == "None") {
+      return;
+    }
+
+    // Lets switch these states    
+    this.game.state.states.play.genistars.pool[this.name].shaping = !this.game.state.states.play.genistars.pool[this.name].shaping;
+    
+    // this.genistars.pool[key].shaping toggle
+  }
 
   this.init = function () {
     this.rect = new Phaser.Rectangle(0, 0, 0, this.barFg.height);
@@ -108,6 +164,7 @@ game.state.add('play', {
     game.load.spritesheet('button', 'assets/buttonsheet300x87x3.png', 300, 87);
     game.load.image('barFront', 'assets/barInterior.png');
     game.load.image('barBack', 'assets/barExterior.png');
+    game.load.image('addBtn', 'assets/plus.png');
 
     // Panels
 
@@ -188,12 +245,16 @@ game.state.add('play', {
       x: 10,
       y: 35,
     }
-    this.stableText = {}
-    this.stableProgBars = {}
+    this.stableText = {};
+    this.stableProgBars = {};
+    this.stableAddButtons = {};
     for (var key in this.genistars.pool) {
-      this.stableText[key] = new KeyValueText(this.game, start.x, start.y, this.stablePanel.panelGroup, 12),
-      this.stableProgBars[key] = new ProgressBar(this.game, this.stablePanel.panelGroup.width - 100, start.y, this.stablePanel.panelGroup, 'barBack', 'barFront');
+      this.stableAddButtons[key] = new AddButton(this.game, start.x, start.y, this.stablePanel.panelGroup, key);
+      this.stableText[key] = new KeyValueText(this.game, start.x+20, start.y, this.stablePanel.panelGroup, 12),
+      this.stableProgBars[key] = new ProgressBar(this.game, this.stablePanel.panelGroup.width - 100, start.y, this.stablePanel.panelGroup, 'barBack', 'barFront', key, true);
+      this.stableProgBars[key].init();
       start.y += 20;
+      
     }
 
     // OK! Let's start the game!
@@ -226,14 +287,14 @@ game.state.add('play', {
     // Genistars
     this.genistars = {
       pool: {
-        def: {type: 'Default', count: 1, shaping: false, shaped: 0, shapedMax: 100},
-        mou: {type: 'ge-mouse', count: 0, shaping: false, shaped: 0, shapedMax: 100},
-        rat: {type: 'ge-rat', count: 0, shaping: false, shaped: 0, shapedMax: 100},
-        cat: {type: 'ge-cat', count: 0, shaping: false, shaped: 0, shapedMax: 100},
-        dog: {type: 'ge-dog', count: 0, shaping: false, shaped: 0, shapedMax: 100},
-        mule: {type: 'ge-mule', count: 0, shaping: false, shaped: 0, shapedMax: 100},
-        horse: {type: 'ge-horse', count: 0, shaping: false, shaped: 0, shapedMax: 100},
-        crow: {type: 'ge-crow', count: 0, shaping: false, shaped: 0, shapedMax: 100},
+        def: {type: 'Default', count: 1, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        mou: {type: 'ge-mouse', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        rat: {type: 'ge-rat', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        cat: {type: 'ge-cat', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        dog: {type: 'ge-dog', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        mule: {type: 'ge-mule', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        horse: {type: 'ge-horse', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        crow: {type: 'ge-crow', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
       }
     };
 
@@ -248,6 +309,30 @@ game.state.add('play', {
 
     for (var key in this.genistars.pool) {
       this.stableText[key].updateText(this.genistars.pool[key].type, this.genistars.pool[key].count);
+      this.stableProgBars[key].update(this.genistars.pool[key].shaped, this.genistars.pool[key].shapedMax);
+      if (this.genistars.pool[key].eggPaid == 0 && this.genistars.pool[key].shaping) {
+        this.stableProgBars[key].activeObj.text = "Egg Deficit!";
+      } else if (this.genistars.pool[key].eggPaid == 1 && this.genistars.pool[key].shaping == false) {
+        this.stableProgBars[key].activeObj.text = "Egg Surplus!";
+      } else {
+        this.stableProgBars[key].activeObj.text = "";
+      }
+      //this.stableProgBars[key].activeObj.text = "Ready!";
+      this.stableAddButtons[key].countObj.text = this.genistars.pool[key].eggPaid;
+    }
+  },
+  shapeEggs: function(intervalsPassed=1) {
+    for (var i = 1; i <= intervalsPassed; i++) {
+      for (var key in this.genistars.pool) {
+        if (this.genistars.pool[key].shaping && this.genistars.pool[key].eggPaid >= 1) {
+          this.genistars.pool[key].shaped++;
+          if (this.genistars.pool[key].shaped >= 100) {
+            this.genistars.pool[key].shaped = 0;
+            this.genistars.pool[key].count += 1;
+            this.genistars.pool[key].eggPaid--;
+          }
+        }
+      }
     }
   },
   growEggs: function(intervalsPassed=1) {
@@ -264,6 +349,7 @@ game.state.add('play', {
   GameLoop: function() {
 
     this.updateText();
+    this.shapeEggs();
     this.growEggs();
     this.eggProgBar.update(this.player.eggProgress, this.player.eggProgressMax);
   }
