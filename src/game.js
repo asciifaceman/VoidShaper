@@ -75,7 +75,7 @@ function AddButton(game, x, y, panelGroup, name="None") {
       return;
     }
     // pay for some eggs mang
-    if (game.state.states.play.player.eggs >= 1) {
+    if (game.state.states.play.player.eggs >= 1 && game.state.states.play.genistars.pool[this.name].count < game.state.states.play.genistars.pool[this.name].max) {
       game.state.states.play.player.eggs -= 1;
       game.state.states.play.genistars.pool[this.name].eggPaid++;
     }
@@ -218,7 +218,12 @@ game.state.add('play', {
 
   create: function() { // Phaser creation phase
     var state = this;
+    this.styleTitle = { font: "10px Courier", fill: "#fff", tabs: 80 };
     this.init();
+
+    // System Panel
+    //
+    this.versionText = this.game.add.text(0, 0, this.system.name + " v" + this.system.version, this.styleTitle)
 
     // Player Panel
     //
@@ -227,6 +232,7 @@ game.state.add('play', {
 
     this.playerPanelText = {
       LevelText: new PanelText(this.game, 10, 35, this.playerPanel.panelGroup, 12),
+      GoldText: new PanelText(this.game, 80, 35, this.playerPanel.panelGroup, 12),
       RankText: new PanelText(this.game, 10, 50, this.playerPanel.panelGroup, 12),
       EggText: new PanelText(this.game, 10, 65, this.playerPanel.panelGroup, 12),
     }
@@ -268,6 +274,7 @@ game.state.add('play', {
     this.grow = 0;
     this.system = {
       interval: 100,
+      name: "VoidShaper",
       version: 0.1,
     }
 
@@ -278,6 +285,7 @@ game.state.add('play', {
     this.player = {
       name: "Player Name",
       level: 1, // 5 levels per rank or something
+      gold: 0,
       rank: 0,
       eggs: 0,
       eggProgress: 0,
@@ -287,14 +295,14 @@ game.state.add('play', {
     // Genistars
     this.genistars = {
       pool: {
-        def: {type: 'Default', count: 1, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        mou: {type: 'ge-mouse', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        rat: {type: 'ge-rat', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        cat: {type: 'ge-cat', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        dog: {type: 'ge-dog', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        mule: {type: 'ge-mule', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        horse: {type: 'ge-horse', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        crow: {type: 'ge-crow', count: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        def: {type: 'Default', count: 1, max: 3, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        mou: {type: 'ge-mouse', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        rat: {type: 'ge-rat', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        cat: {type: 'ge-cat', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        dog: {type: 'ge-dog', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        mule: {type: 'ge-mule', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        horse: {type: 'ge-horse', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        crow: {type: 'ge-crow', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
       }
     };
 
@@ -306,6 +314,7 @@ game.state.add('play', {
     this.playerPanelText.RankText.updateText("Rank: " + this.ranks[this.player.rank]);
     this.playerPanelText.LevelText.updateText("Lvl: " + this.player.level);
     this.playerPanelText.EggText.updateText("Eggs: " + this.player.eggs);
+    this.playerPanelText.GoldText.updateText("Gold: " + this.player.gold);
 
     for (var key in this.genistars.pool) {
       this.stableText[key].updateText(this.genistars.pool[key].type, this.genistars.pool[key].count);
