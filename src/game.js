@@ -14,8 +14,76 @@ var gameConfg = {
   //parent: 'phaser-example',
   //scaleMode: Phaser.ScaleManager.EXACT_FIT
 }
+
 // Create game object
 var game = new Phaser.Game(gameConfg);
+
+// UI Classes
+function PanelText(game, x, y, panelGroup, size) {
+  this.game = game;
+  this.x = x;
+  this.y = y;
+  this.group = panelGroup;
+
+  this.styleTitle = { font: size + "px Courier", fill: "#fff", tabs: 80 };
+  this.textObj = this.group.addChild(this.game.add.text(this.x, this.y, "", this.styleTitle));
+  this.updateText = function(text) {
+    this.textObj.text = text;
+  };
+}
+
+function ProgressBar(game, x, y, panelGroup, trackerCur, trackerMax, bgGraphic, fgGraphic) {
+  this.game = game;
+  this.x = x;
+  this.y = y;
+  this.group = panelGroup;
+  this.bgGraphic = bgGraphic;
+  this.fgGraphic = fgGraphic;
+  this.trackerCur = trackerCur; // What are we comparing against?
+  this.trackerMax = trackerMax;
+  this.rect = null;
+
+  this.barBg = this.group.addChild(this.game.add.image(this.x, this.y, this.bgGraphic));
+  if (this.bgGraphic == 'barBack' || this.bgGraphic == 'barFront') {
+    this.barBg.scale.setTo(0.75, 0.75);
+  }
+  this.barFg = this.group.addChild(this.game.add.image(this.x+4, this.y+4, this.fgGraphic));
+  if (this.fgGraphic == 'barBack' || this.fgGraphic == 'barFront') {
+    this.barFg.scale.setTo(0.75, 0.75);
+  }
+
+  this.fullWidth = this.barFg.width;
+
+  this.init = function () {
+    this.rect = new Phaser.Rectangle(0, 0, 0, 0, this.barFg.height);
+    this.barFg.crop(this.rect);
+  }
+  this.update = function () {
+    this.rect.width = Math.max(0, (this.trackerCur / this.trackerMax) * this.fullWidth);
+    this.barFg.crop(this.rect);
+  }
+}
+
+function Panel (game, x, y, title, size) {
+  this.game = game;
+  this.x = x;
+  this.y = y;
+  this.title = title;
+  this.size = size;
+  this.styleTitle = { font: "16px Courier", fill: "#fff", tabs: 80 };
+  this.panelBody = null;
+  this.panelHead = null;
+  this.panelGroup = null;
+  this.spawn = function () {
+    this.panelGroup = this.game.add.group();
+    this.panelGroup.position.setTo(this.x, this.y);
+    this.panelBody = this.panelGroup.addChild(this.game.add.image(0, 0, this.game.cache.getBitmapData(this.size)));    
+    this.panelHead = this.panelGroup.addChild(this.game.add.image(0, 0, this.game.cache.getBitmapData('panelHead')));
+    this.panelHead.alpha = 0.8;
+    this.titleHead = this.panelGroup.addChild(this.game.add.text(5, 5, this.title, this.styleTitle));
+  };
+
+};
 
 game.state.add('play', {
   preload: function() {
@@ -25,21 +93,42 @@ game.state.add('play', {
     game.load.image('barFront', 'assets/barInterior.png');
     game.load.image('barBack', 'assets/barExterior.png');
 
-    // A panel experiment
-    var panelTest = this.game.add.bitmapData(250, 500);
-    panelTest.ctx.fillStyle = '#5a6772';
-    panelTest.ctx.strokeStyle = '#31363a';
-    panelTest.ctx.lineWidth = 5;
-    panelTest.ctx.fillRect(0, 0, 250, 500);
-    panelTest.ctx.strokeRect(0, 0, 250, 500);
-    this.game.cache.addBitmapData('panel', panelTest);
+    // Panels
 
-    var panelTestHead = this.game.add.bitmapData(250, 30);
-    panelTestHead.ctx.fillStyle = '#282c33';
-    panelTestHead.ctx.strokeStyle = '#31363a';
-    panelTestHead.ctx.lineWidth = 5;
-    panelTestHead.ctx.fillRect(0, 0, 250, 30);
-    this.game.cache.addBitmapData('panelHead', panelTestHead);
+    // Tall panel
+    var panelTall = this.game.add.bitmapData(250, 500);
+    panelTall.ctx.fillStyle = '#5a6772';
+    panelTall.ctx.strokeStyle = '#31363a';
+    panelTall.ctx.lineWidth = 5;
+    panelTall.ctx.fillRect(0, 0, 250, 500);
+    panelTall.ctx.strokeRect(0, 0, 250, 500);
+    this.game.cache.addBitmapData('panelTall', panelTall);    
+
+    // Medium panel
+    var panelMedium = this.game.add.bitmapData(250, 400);
+    panelMedium.ctx.fillStyle = '#5a6772';
+    panelMedium.ctx.strokeStyle = '#31363a';
+    panelMedium.ctx.lineWidth = 5;
+    panelMedium.ctx.fillRect(0, 0, 250, 400);
+    panelMedium.ctx.strokeRect(0, 0, 250, 400);
+    this.game.cache.addBitmapData('panelMedium', panelMedium);
+
+    // Short panel
+    var panelShort = this.game.add.bitmapData(250, 100);
+    panelShort.ctx.fillStyle = '#5a6772';
+    panelShort.ctx.strokeStyle = '#31363a';
+    panelShort.ctx.lineWidth = 5;
+    panelShort.ctx.fillRect(0, 0, 250, 100);
+    panelShort.ctx.strokeRect(0, 0, 250, 100);
+    this.game.cache.addBitmapData('panelShort', panelShort);
+
+    // Panel header
+    var panelHead = this.game.add.bitmapData(250, 30);
+    panelHead.ctx.fillStyle = '#282c33';
+    panelHead.ctx.strokeStyle = '#31363a';
+    panelHead.ctx.lineWidth = 5;
+    panelHead.ctx.fillRect(0, 0, 250, 30);
+    this.game.cache.addBitmapData('panelHead', panelHead);
 
     var panelItem = this.game.add.bitmapData(225, 40);
     panelItem.ctx.strokeStyle = '#31363a';
@@ -47,52 +136,11 @@ game.state.add('play', {
     //panelItem.ctx.fillRect(0, 0, 200, 40);
     panelItem.ctx.strokeRect(0, 0, 225, 40);
     this.game.cache.addBitmapData('panelItem', panelItem);
-
-    game.stage.disableVisibilityChange = true;
-
-    this.grow = 0;
-    this.system = {
-      interval: 100,
-      version: 0.1,
-    }    
+  
   },
 
   click: function() {
     console.log("Clicked");
-  },
-
-  createStablePanel: function() {
-    var state = this;
-    var style = { font: "16px Courier", fill: "#fff", tabs: 80 };
-
-    this.stableGroup = this.game.add.group();
-    this.stableGroup.position.setTo(25, 50);
-
-    this.stableBody = this.stableGroup.addChild(this.game.add.image(0, 0, this.game.cache.getBitmapData('panel')));
-    this.stableHead = this.stableGroup.addChild(this.game.add.image(0, 0, this.game.cache.getBitmapData('panelHead')));
-    this.stableHead.alpha = 0.8;
-
-    this.stableHeadText = this.stableGroup.addChild(this.game.add.text(5, 5, "Stable", style));
-    //this.stableBodyTest = this.stableGroup.addChild(this.game.add.text(5,30, "Item\tCount\tAction", style));
-
-    //this.item = this.stableGroup.addChild(this.game.add.image(12, 50, this.game.cache.getBitmapData('panelItem')));
-    //this.item = this.stableGroup.addChild(this.game.add.sprite(12, 50, 'itembg'));
-    //this.itemText = this.stableGroup.addChild(this.game.add.text(20, 60, "Eggs\tcount\tbar", style));
-
-    // Button
-    this.button = this.stableGroup.addChild(this.game.add.button(this.stableGroup.width-80, 50, 'button', this.click, this, 2, 2, 1));
-    this.button.scale.setTo(0.25, 0.25);
-    this.buttonText = this.stableGroup.addChild(this.game.add.text(this.button.x+15, this.button.y+2, "Shape", style));
-
-    // Progress Bar
-    this.barBack = this.stableGroup.addChild(this.game.add.image(this.button.left-100, this.button.top+2, 'barBack'));
-    this.barBack.scale.setTo(0.75,0.75);
-    this.barFront = this.stableGroup.addChild(this.game.add.image(this.button.left-96, this.button.top+6, 'barFront'));
-    this.barFullWidth = this.barFront.width;
-    this.barFront.scale.setTo(0.75,0.75);
-
-    this.initBar(this.barFront);
-    this.RunTime = this.game.time.events.loop(this.system.interval, this.GameLoop, this);
   },
 
   initBar: function(barObj) {
@@ -100,24 +148,89 @@ game.state.add('play', {
     barObj.crop(this.barRect);
   },
   
-  create: function() {
+  create: function() { // Phaser creation phase
     var state = this;
-    this.createStablePanel();
+    this.init();
 
-    
+    // Player Panel
+    this.playerPanel = new Panel(this.game, 25, 25, this.player.name, "panelShort");
+    this.playerPanel.spawn();
+
+    this.playerPanelText = {
+      LevelText: new PanelText(this.game, 10, 35, this.playerPanel.panelGroup, 12),
+      RankText: new PanelText(this.game, 10, 50, this.playerPanel.panelGroup, 12),
+      EggText: new PanelText(this.game, 10, 65, this.playerPanel.panelGroup, 12),
+    }
+
+    // Player egg progress bar
+    this.eggProgBar = new ProgressBar(this.game, this.playerPanelText.EggText.x + 140, this.playerPanelText.EggText.y, this.playerPanel.panelGroup, this.player.eggProgress, this.player.eggProgressMax, 'barBack', 'barFront');
+    this.eggProgBar.init();
+
+    // Stable Panel
+    this.stablePanel = new Panel(this.game, 25, 140, "Stable", "panelMedium");
+    this.stablePanel.spawn();
+
+    // OK! Let's start the game!
+    this.RunTime = this.game.time.events.loop(this.system.interval, this.GameLoop, this);
+  }, 
+  init: function() { 
+    // Things that must happen only once
+    // BEFORE CREATE
+    game.stage.disableVisibilityChange = true;
+
+    this.grow = 0;
+    this.system = {
+      interval: 100,
+      version: 0.1,
+    }
+
+    // Ranks
+    this.ranks = ["Initiate", "Apprentice", "Adept", "Graduate", "Master", "Grand Master"];
+
+    // Player Object
+    this.player = {
+      name: "Player Name",
+      level: 1,
+      rank: 0,
+      eggs: 0,
+      eggProgress: 50,
+      eggProgressMax: 100,
+    };
+
+    // Genistars
+    this.genistars = {
+      pool: {
+        def: {type: 'Default', count: 1, shaping: false, shaped: 0},
+        mou: {type: 'ge-mouse', count: 0, shaping: false, shaped: 0},
+      }
+    };
+
+    //this.initBar(this.barFront);    
   },
-
   render: function() {
 
   },
-
-  GameLoop: function() {
-    this.grow++;
-    if (this.grow >= 100) {
-      this.grow = 0;
+  updateText: function() { // Every GameLoop update dynamic text
+    this.playerPanelText.RankText.updateText("Rank: " + this.ranks[this.player.rank]);
+    this.playerPanelText.LevelText.updateText("Lvl: " + this.player.level);
+    this.playerPanelText.EggText.updateText("Eggs: " + this.player.eggs);
+  },
+  growEggs: function(intervalsPassed=1) {
+    for (var i = 1; i <= intervalsPassed; i++) {
+      this.player.eggProgress++;
+      this.eggProgBar.update();
+      if (this.player.eggProgress >= this.player.eggProgressMax) {
+        this.player.eggs += 1 * this.genistars.pool.def.count;
+        this.player.eggProgress = 0;
+        this.eggProgBar.update();        
+      }
     }
-    this.barRect.width = Math.max(0, (this.grow / 100) * this.barFullWidth);
-    this.barFront.crop(this.barRect);
+  },
+  GameLoop: function() {
+
+    this.updateText();
+    this.growEggs();
+    this.eggProgBar.update();
   }
 });
 

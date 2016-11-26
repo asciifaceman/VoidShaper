@@ -24,7 +24,7 @@ The current denizens are human colonists who "crashed" accidentally through the 
 4. Sell creatures at market
     * Demand / value based on creature ability
         * (A work ge-horse will be more valuable than a ge-rat)
-5. Use currency to expand stable and guild
+5. Use currency to expand stable and guild or buy tomes
     * Stable
         * Increased slots to host Defaults and other creatures
             * Can only host 1 of each creature at first
@@ -34,6 +34,7 @@ The current denizens are human colonists who "crashed" accidentally through the 
             * Apprentices are not all equal
             * Basic stats around "capability", or inherent talent to feel the void
         * Increased noteriety (higher prices / market cap)
+        * Higher guild standing gives ability to buy "tomes" with detailed descriptions of new animals from landing that open new genistars
 6. Level character to better void shaping abilities
     * EXP increases on successful shaping, sales, etc
     * Increased levels buff shaping skill
