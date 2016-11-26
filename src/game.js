@@ -32,6 +32,22 @@ function PanelText(game, x, y, panelGroup, size) {
   };
 }
 
+function KeyValueText(game, x, y, panelGroup, size) {
+  this.game = game;
+  this.x = x;
+  this.y = y;
+  this.group = panelGroup;
+
+  this.styleTitle = { font: size + "px Courier", fill: "#fff", tabs: 80 };
+  this.textObjKey = this.group.addChild(this.game.add.text(this.x, this.y, "", this.styleTitle));
+  this.textObjValue = this.group.addChild(this.game.add.text(this.x + 10, this.y, "", this.styleTitle));
+  this.updateText = function(key, value) {
+    this.textObjKey.text = key;
+    this.textObjValue.x = (this.textObjKey.x + this.textObjKey.width + 10);
+    this.textObjValue.text = value;
+  };
+}
+
 function ProgressBar(game, x, y, panelGroup, bgGraphic, fgGraphic) {
   this.game = game;
   this.x = x;
@@ -57,8 +73,9 @@ function ProgressBar(game, x, y, panelGroup, bgGraphic, fgGraphic) {
     //this.barFg.crop(this.rect);
   }
   this.update = function (now, max) {
+    this.barFg.x = this.barBg.x + 4;
+    this.barFg.y = this.barBg.y + 4;
     this.rect.width = Math.max(0, (now / max) * this.fullWidth);
-    console.log(this.rect.width);
     this.barFg.crop(this.rect);
   }
 }
@@ -147,6 +164,7 @@ game.state.add('play', {
     this.init();
 
     // Player Panel
+    //
     this.playerPanel = new Panel(this.game, 25, 25, this.player.name, "panelShort");
     this.playerPanel.spawn();
 
@@ -161,8 +179,22 @@ game.state.add('play', {
     this.eggProgBar.init();
 
     // Stable Panel
+    //
     this.stablePanel = new Panel(this.game, 25, 140, "Stable", "panelMedium");
     this.stablePanel.spawn();
+
+    // Stable Text & prog bars
+    var start = {
+      x: 10,
+      y: 35,
+    }
+    this.stableText = {}
+    this.stableProgBars = {}
+    for (var key in this.genistars.pool) {
+      this.stableText[key] = new KeyValueText(this.game, start.x, start.y, this.stablePanel.panelGroup, 12),
+      this.stableProgBars[key] = new ProgressBar(this.game, this.stablePanel.panelGroup.width - 100, start.y, this.stablePanel.panelGroup, 'barBack', 'barFront');
+      start.y += 20;
+    }
 
     // OK! Let's start the game!
     this.RunTime = this.game.time.events.loop(this.system.interval, this.GameLoop, this);
@@ -194,8 +226,14 @@ game.state.add('play', {
     // Genistars
     this.genistars = {
       pool: {
-        def: {type: 'Default', count: 1, shaping: false, shaped: 0},
-        mou: {type: 'ge-mouse', count: 0, shaping: false, shaped: 0},
+        def: {type: 'Default', count: 1, shaping: false, shaped: 0, shapedMax: 100},
+        mou: {type: 'ge-mouse', count: 0, shaping: false, shaped: 0, shapedMax: 100},
+        rat: {type: 'ge-rat', count: 0, shaping: false, shaped: 0, shapedMax: 100},
+        cat: {type: 'ge-cat', count: 0, shaping: false, shaped: 0, shapedMax: 100},
+        dog: {type: 'ge-dog', count: 0, shaping: false, shaped: 0, shapedMax: 100},
+        mule: {type: 'ge-mule', count: 0, shaping: false, shaped: 0, shapedMax: 100},
+        horse: {type: 'ge-horse', count: 0, shaping: false, shaped: 0, shapedMax: 100},
+        crow: {type: 'ge-crow', count: 0, shaping: false, shaped: 0, shapedMax: 100},
       }
     };
 
@@ -207,6 +245,10 @@ game.state.add('play', {
     this.playerPanelText.RankText.updateText("Rank: " + this.ranks[this.player.rank]);
     this.playerPanelText.LevelText.updateText("Lvl: " + this.player.level);
     this.playerPanelText.EggText.updateText("Eggs: " + this.player.eggs);
+
+    for (var key in this.genistars.pool) {
+      this.stableText[key].updateText(this.genistars.pool[key].type, this.genistars.pool[key].count);
+    }
   },
   growEggs: function(intervalsPassed=1) {
     for (var i = 1; i <= intervalsPassed; i++) {
