@@ -74,10 +74,16 @@ function AddButton(game, x, y, panelGroup, name="None") {
     if (this.name == "None") {
       return;
     }
-    // pay for some eggs mang
-    if (game.state.states.play.player.eggs >= 1 && game.state.states.play.genistars.pool[this.name].count < game.state.states.play.genistars.pool[this.name].max) {
-      game.state.states.play.player.eggs -= 1;
-      game.state.states.play.genistars.pool[this.name].eggPaid++;
+    console.log(game.input.keyboard.createCursorKeys().down.shiftKey);
+    if (game.input.keyboard.createCursorKeys().down.shiftkey && game.state.states.play.genistars.pool[this.name].eggPaid >= 1) {
+      game.state.states.play.genistars.pool[this.name].eggPaid -= 1;
+      game.state.states.play.player.eggs += 1;
+    } else {
+      // pay for some eggs mang
+      if (game.state.states.play.player.eggs >= 1 && game.state.states.play.genistars.pool[this.name].count < game.state.states.play.genistars.pool[this.name].max) {
+        game.state.states.play.player.eggs -= 1;
+        game.state.states.play.genistars.pool[this.name].eggPaid++;
+      }
     }
   }
 }
@@ -295,10 +301,10 @@ game.state.add('play', {
     // Genistars
     this.genistars = {
       pool: {
-        def: {type: 'Default', count: 1, max: 3, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        mou: {type: 'ge-mouse', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        rat: {type: 'ge-rat', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
-        cat: {type: 'ge-cat', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        def: {type: 'Default', count: 1, max: 300, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        mou: {type: 'ge-mouse', count: 0, max: 30, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        rat: {type: 'ge-rat', count: 0, max: 30, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
+        cat: {type: 'ge-cat', count: 0, max: 30, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
         dog: {type: 'ge-dog', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
         mule: {type: 'ge-mule', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
         horse: {type: 'ge-horse', count: 0, max: 0, shaping: false, shaped: 0, shapedMax: 100, eggPaid: 0},
