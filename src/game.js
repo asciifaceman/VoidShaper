@@ -277,7 +277,7 @@ game.state.add('play', {
     // Player Object
     this.player = {
       name: "Player Name",
-      level: 1,
+      level: 1, // 5 levels per rank or something
       rank: 0,
       eggs: 0,
       eggProgress: 0,
@@ -312,7 +312,7 @@ game.state.add('play', {
       this.stableProgBars[key].update(this.genistars.pool[key].shaped, this.genistars.pool[key].shapedMax);
       if (this.genistars.pool[key].eggPaid == 0 && this.genistars.pool[key].shaping) {
         this.stableProgBars[key].activeObj.text = "Egg Deficit!";
-      } else if (this.genistars.pool[key].eggPaid == 1 && this.genistars.pool[key].shaping == false) {
+      } else if (this.genistars.pool[key].eggPaid >= 1 && this.genistars.pool[key].shaping == false) {
         this.stableProgBars[key].activeObj.text = "Egg Surplus!";
       } else {
         this.stableProgBars[key].activeObj.text = "";
@@ -327,6 +327,7 @@ game.state.add('play', {
         if (this.genistars.pool[key].shaping && this.genistars.pool[key].eggPaid >= 1) {
           this.genistars.pool[key].shaped++;
           if (this.genistars.pool[key].shaped >= 100) {
+            // Should be a chane of success based on rank
             this.genistars.pool[key].shaped = 0;
             this.genistars.pool[key].count += 1;
             this.genistars.pool[key].eggPaid--;
