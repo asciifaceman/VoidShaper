@@ -32,15 +32,13 @@ function PanelText(game, x, y, panelGroup, size) {
   };
 }
 
-function ProgressBar(game, x, y, panelGroup, trackerCur, trackerMax, bgGraphic, fgGraphic) {
+function ProgressBar(game, x, y, panelGroup, bgGraphic, fgGraphic) {
   this.game = game;
   this.x = x;
   this.y = y;
   this.group = panelGroup;
   this.bgGraphic = bgGraphic;
   this.fgGraphic = fgGraphic;
-  this.trackerCur = trackerCur; // What are we comparing against?
-  this.trackerMax = trackerMax;
   this.rect = null;
 
   this.barBg = this.group.addChild(this.game.add.image(this.x, this.y, this.bgGraphic));
@@ -48,18 +46,19 @@ function ProgressBar(game, x, y, panelGroup, trackerCur, trackerMax, bgGraphic, 
     this.barBg.scale.setTo(0.75, 0.75);
   }
   this.barFg = this.group.addChild(this.game.add.image(this.x+4, this.y+4, this.fgGraphic));
+  this.fullWidth = this.barFg.width;
   if (this.fgGraphic == 'barBack' || this.fgGraphic == 'barFront') {
     this.barFg.scale.setTo(0.75, 0.75);
   }
 
-  this.fullWidth = this.barFg.width;
 
   this.init = function () {
-    this.rect = new Phaser.Rectangle(0, 0, 0, 0, this.barFg.height);
-    this.barFg.crop(this.rect);
+    this.rect = new Phaser.Rectangle(0, 0, 0, this.barFg.height);
+    //this.barFg.crop(this.rect);
   }
-  this.update = function () {
-    this.rect.width = Math.max(0, (this.trackerCur / this.trackerMax) * this.fullWidth);
+  this.update = function (now, max) {
+    this.rect.width = Math.max(0, (now / max) * this.fullWidth);
+    console.log(this.rect.width);
     this.barFg.crop(this.rect);
   }
 }
@@ -143,11 +142,6 @@ game.state.add('play', {
     console.log("Clicked");
   },
 
-  initBar: function(barObj) {
-    this.barRect = new Phaser.Rectangle(0, 0, 0, barObj.height);
-    barObj.crop(this.barRect);
-  },
-  
   create: function() { // Phaser creation phase
     var state = this;
     this.init();
@@ -163,7 +157,7 @@ game.state.add('play', {
     }
 
     // Player egg progress bar
-    this.eggProgBar = new ProgressBar(this.game, this.playerPanelText.EggText.x + 140, this.playerPanelText.EggText.y, this.playerPanel.panelGroup, this.player.eggProgress, this.player.eggProgressMax, 'barBack', 'barFront');
+    this.eggProgBar = new ProgressBar(this.game, this.playerPanelText.EggText.x + 140, this.playerPanelText.EggText.y, this.playerPanel.panelGroup, 'barBack', 'barFront');
     this.eggProgBar.init();
 
     // Stable Panel
@@ -193,7 +187,7 @@ game.state.add('play', {
       level: 1,
       rank: 0,
       eggs: 0,
-      eggProgress: 50,
+      eggProgress: 0,
       eggProgressMax: 100,
     };
 
@@ -205,7 +199,6 @@ game.state.add('play', {
       }
     };
 
-    //this.initBar(this.barFront);    
   },
   render: function() {
 
@@ -218,11 +211,11 @@ game.state.add('play', {
   growEggs: function(intervalsPassed=1) {
     for (var i = 1; i <= intervalsPassed; i++) {
       this.player.eggProgress++;
-      this.eggProgBar.update();
+      //this.eggProgBar.update();
       if (this.player.eggProgress >= this.player.eggProgressMax) {
         this.player.eggs += 1 * this.genistars.pool.def.count;
         this.player.eggProgress = 0;
-        this.eggProgBar.update();        
+        //this.eggProgBar.update();        
       }
     }
   },
@@ -230,7 +223,7 @@ game.state.add('play', {
 
     this.updateText();
     this.growEggs();
-    this.eggProgBar.update();
+    this.eggProgBar.update(this.player.eggProgress, this.player.eggProgressMax);
   }
 });
 
