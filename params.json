@@ -1,6 +1,0 @@
-{
-  "name": "Voidshaper",
-  "tagline": "Peter F Hamilton universe inspired incremental game about life in the void and shaping Genistars",
-  "body": "### Game Play\r\n1. Gather eggs\r\n2. Shape genistars\r\n3. ???\r\n4. Profit\r\n\r\n### To Run the game right now\r\n1. have python\r\n2. run ./dev.sh in directory\r\n3. browse localhost:8000",
-  "note": "Don't delete this file! It's used internally to help with page regeneration."
-}
