@@ -167,10 +167,10 @@ game.state.add('play', {
   preload: function() {
 
     game.load.image('itembg', 'assets/itemBackground.png');
-    game.load.spritesheet('button', 'assets/buttonsheet300x87x3.png', 300, 87);
-    game.load.image('barFront', 'assets/barInterior.png');
-    game.load.image('barBack', 'assets/barExterior.png');
-    game.load.image('addBtn', 'assets/plus.png');
+    game.load.spritesheet('button', 'assets/buttons/buttonsheet300x87x3.png', 300, 87);
+    game.load.image('barFront', 'assets/progressBar/barInterior.png');
+    game.load.image('barBack', 'assets/progressBar/barExterior.png');
+    game.load.image('addBtn', 'assets/icons/plus.png');
 
     // Panels
 

@@ -30,4 +30,4 @@ You may notice NPM and Grunt resources in the repo. Do not worry about it right 
 
 ----
 ### Licensing
-Within LICENSE.md you will find the `GNU GENERAL PUBLIC LICENSE` that applies to the code within. This does not apply to the IP being used, which is attributed to Random House / Peter F. Hamilton. We will cease usage of this IP at their request, but be very depressed about it. 
+Within [LICENSE.md](LICENSE.md) you will find the `GNU GENERAL PUBLIC LICENSE` that applies to the code within. This does not apply to the IP being used, which is attributed to Random House / Peter F. Hamilton. We will cease usage of this IP at their request, but be very depressed about it. 
