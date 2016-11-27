@@ -1,0 +1,13 @@
+# Void Shaper 
+----
+### Mythos
+VoidShaper is loving based within the works of Peter F. Hamilton and his void trilogy, on the planet of Querencia. This planet exists within a pocket universe created by one of the earliest civilizations to rise in our universe. They feared the end of the universe and their own demise like many do, so they toiled at making the Void so that they may go on forever in a Utopia of their design. If you want to know how well that worked out, read the books.
+
+Our story follows a descendent of a human colonyship that mistakenly entered the void in the early days of space exploration. Within the void, technology as we know it does not work, and begins decaying immediately upon entry due to the varying laws of nature within. The survivors of the crash rebuilt a civilization for themselves, and some who were more finely in tune with this pocket universe (including the original captain of the ship who "invented" the art) discovered they could manipulate it with their minds.
+
+This descendent has a bit of a gift, his ability to manipulate the laws and understand what he is doing is the best the world has seen since the captain himself used his mind to carve the great gates into the alien material their capital city is made out of.
+
+### Shaping
+The concept of shaping is fairly simple, and all science fiction. You start with a Genistar, which is believed to be an animal that was engineered either by the original colonists or shortly after their crash landing. The Genistars are different than the natural fauna of querencia. They possess great potential, in that their base structure can be manipulated into many forms and creatures, given they never have more than 6 arms and/or 6 legs. Most of the creatures shaped from the Default Genistar are also not native to Querencia, and are instead shaped based on knowledge and imagery inscribed in ancient records from landing, creatures from old earth. 
+
+Shaping is performed by someone adept at manipulating reality within the Void. For the most part, they do not understand how they are doing what they are doing, or the mechanics involved. The name **shaping** came from their *perception* of what was happening. It quite lierally feels like they are using shaping the creature into existance like it were clay. The embryo of the egg's DNA is modified so it will grow into something completely different than the Default genistar. 
