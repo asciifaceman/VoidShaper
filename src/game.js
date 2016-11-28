@@ -15,6 +15,8 @@ var gameConfg = {
   //scaleMode: Phaser.ScaleManager.EXACT_FIT
 }
 
+var cursors;
+
 // Create game object
 var game = new Phaser.Game(gameConfg);
 
@@ -74,8 +76,7 @@ function AddButton(game, x, y, panelGroup, name="None") {
     if (this.name == "None") {
       return;
     }
-    console.log(game.input.keyboard.createCursorKeys().down.shiftKey);
-    if (game.input.keyboard.createCursorKeys().down.shiftkey && game.state.states.play.genistars.pool[this.name].eggPaid >= 1) {
+    if (game.state.states.play.shiftOn && game.state.states.play.genistars.pool[this.name].eggPaid >= 1) {
       game.state.states.play.genistars.pool[this.name].eggPaid -= 1;
       game.state.states.play.player.eggs += 1;
     } else {
@@ -221,15 +222,27 @@ game.state.add('play', {
   click: function() {
     console.log("Clicked");
   },
-
+  shiftDown: function() {
+    this.shiftOn = true;
+  },
+  shiftUp: function() {
+    this.shiftOn = false;
+  },
   create: function() { // Phaser creation phase
     var state = this;
+
+    // Shift key enabling
+    this.shiftOn = false;
+    this.shift = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
+    this.shift.onDown.add(this.shiftDown, this);
+    this.shift.onUp.add(this.shiftUp, this);
+
     this.styleTitle = { font: "10px Courier", fill: "#fff", tabs: 80 };
     this.init();
 
     // System Panel
     //
-    this.versionText = this.game.add.text(0, 0, this.system.name + " v" + this.system.version, this.styleTitle)
+    this.versionText = this.game.add.text(0, 0, this.system.tag(), this.styleTitle)
 
     // Player Panel
     //
@@ -278,10 +291,15 @@ game.state.add('play', {
     game.stage.disableVisibilityChange = true;
 
     this.grow = 0;
+
+    // System Object
     this.system = {
       interval: 100,
-      name: "VoidShaper",
+      name: "VoidSh aper",
       version: 0.1,
+      tag: function () {
+        return (this.name + " v" + this.version);
+      }
     }
 
     // Ranks
@@ -297,6 +315,11 @@ game.state.add('play', {
       eggProgress: 0,
       eggProgressMax: 100,
     };
+
+    // Meta game states
+    this.gameState = {
+      
+    }
 
     // Genistars
     this.genistars = {
