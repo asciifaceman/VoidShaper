@@ -295,7 +295,7 @@ game.state.add('play', {
     // System Object
     this.system = {
       interval: 100,
-      name: "VoidSh aper",
+      name: "VoidShaper",
       version: 0.1,
       tag: function () {
         return (this.name + " v" + this.version);
